@@ -9,6 +9,7 @@ import { getMovies } from '../services/fakeMovieService';
 class Movies extends Component {
     state = {
         movies : getMovies(),
+        currentPage : 1,
         pageSize : 4
      };
 
@@ -18,8 +19,22 @@ class Movies extends Component {
         console.log(movie)
      };
 
+     handleLike = (movie) => {
+        const movies = [...this.state.movies];
+        const index = movies.indexOf(movie);
+        movies[index].liked = !movies[index].liked;
+        this.setState({ movies })
+    };
+
+    handlePageChange = page => {
+       this.setState({currentPage: page});
+    };
+
+
+
     render() {
         const { length: count} = this.state.movies;
+        const {pageSize, currentPage} = this.state;
         if (this.state.movies.length ===0)
             return <p>There are no movies in the database </p>
         
@@ -50,22 +65,18 @@ class Movies extends Component {
                 ))}
                
             </tbody>
-            <Pagination onPageChange = { this.handlePageChange} itemsCount = { count} pageSize = { this.state.pageSize} />
+            <Pagination 
+                onPageChange = {this.state.handlePageChange} 
+                itemsCount = {count} 
+                pageSize = {pageSize} 
+                currentPage = {currentPage}
+                 />
         </table>
         </div>
         )
     }
 
-    handleLike = (movie) => {
-        const movies = [...this.state.movies];
-        const index = movies.indexOf(movie);
-        movies[index].liked = !movies[index].liked;
-        this.setState({ movies })
-    };
-
-    handlePageChange = page => {
-        console.log(page)
-    }
+   
 
 }
 
