@@ -47,21 +47,37 @@ class Movies extends Component {
 
      handleSort = sortColumn => {
         this.setState({sortColumn})
-     }
+     };
+
+     getPageData = () => {
+        const {
+            pageSize,
+            currentPage,
+            sortColumn,
+            selectedGenre,
+            movies: allMovies,
+        } = this.state
+
+        const filtered = selectedGenre && selectedGenre._id
+                        ? allMovies.filter(m => m.genre._id === selectedGenre._id): allMovies;
+
+        const sorted =  _.orderBy(filtered, [sortColumn.path], [sortColumn.order])
+
+        const movies = Paginate(sorted, currentPage, pageSize);
+
+        return  {totalCount: filtered.length, data: movies}
+
+     };
 
 
 
     render() {
         const { length: count} = this.state.movies;
-        const {pageSize, currentPage, sortColumn, selectedGenre, movies:allMovies} = this.state;
+        const {pageSize, currentPage, sortColumn} = this.state;
         if (count === 0) return <p>There are no movies in the database.</p>;
 
-        const filtered = selectedGenre && selectedGenre._id
-                        ? allMovies.filter(m => m.genre._id === selectedGenre._id): allMovies;
-
-       const sorted =  _.orderBy(filtered, [sortColumn.path], [sortColumn.order])
-
-        const movies = Paginate(sorted, currentPage, pageSize);
+        const result = this.getPageData();
+        const {totalCount, data} = this.getPageData()
         
         if (this.state.movies.length ===0)
             return <p>There are no movies in the database </p>
@@ -77,9 +93,9 @@ class Movies extends Component {
                     />
                 </div>
                 <div className="col">
-                <p>Showing { filtered.length } movies in the database</p>
+                <p>Showing { totalCount } movies in the database</p>
                 <MoviesTable
-                    movies = {movies}
+                    movies = {data}
                     sortColumn = {sortColumn}
                     onLike = {this.handleLike}
                     onDelete = {this.handleDelete}
@@ -87,7 +103,7 @@ class Movies extends Component {
                 />
                 <Pagination 
                     onPageChange = {this.handlePageChange} 
-                    itemsCount = {filtered.length} 
+                    itemsCount = {totalCount} 
                     pageSize = {pageSize} 
                     currentPage = {currentPage}
              />
