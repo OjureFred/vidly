@@ -44,7 +44,7 @@ class MoviesTable extends Component {
         </tbody> */}
         
     </table>
-         );
+         )
         
     }
 }
